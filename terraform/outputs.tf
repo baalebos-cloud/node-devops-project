@@ -1,5 +1,3 @@
-output "instance_ip" {
-  description = "Public IP of the EC2 instance"
-  value       = aws_instance.node_server.public_ip
+output "alb_dns_name" {
+  value = aws_lb.app_alb.dns_name
 }
-

@@ -13,18 +13,14 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432
 });
 
-// Middleware to parse JSON
 app.use(express.json());
 
 // Root endpoint
 app.get("/", (req, res) => {
-  console.log(`Request received at ${new Date().toISOString()}`);
-  res.status(200).json({
-    message: "Node DevOps App is running 🚀"
-  });
+  res.status(200).json({ message: "Node DevOps App is running 🚀" });
 });
 
-// Health check endpoint
+// Health check
 app.get("/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
@@ -33,41 +29,36 @@ app.get("/health", async (req, res) => {
       database: "connected",
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
-    console.error("Health check failed:", error.message);
-    res.status(500).json({
-      status: "FAILED",
-      database: "disconnected",
-      error: error.message
-    });
+  } catch (err) {
+    res.status(500).json({ status: "FAILED", database: "disconnected" });
   }
 });
 
-// GET /status endpoint
+// Status endpoint
 app.get("/status", (req, res) => {
-  res.json({
+  res.status(200).json({
     app: "Node-DevOps Project",
-    environment: process.env.NODE_ENV || "demo",
+    environment: "demo",
     uptime_seconds: process.uptime(),
     timestamp: new Date().toISOString()
   });
 });
 
-// POST /process endpoint
+// Process task - now works with POST and GET
 app.post("/process", (req, res) => {
-  const { task } = req.body;
-  if (!task) {
-    return res.status(400).json({ error: "Missing 'task' in request body" });
-  }
-
-  // Simulate processing
-  res.json({
+  const task = req.body.task || "demo";
+  res.status(200).json({
     message: `Task '${task}' processed successfully`,
     processed_at: new Date().toISOString()
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Node-DevOps app listening at http://localhost:${PORT}`);
+app.get("/process", (req, res) => {
+  // fallback GET for demo in browser
+  res.status(200).json({
+    message: "Task 'demo' processed successfully (GET fallback)",
+    processed_at: new Date().toISOString()
+  });
 });
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

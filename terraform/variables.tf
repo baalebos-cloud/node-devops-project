@@ -33,3 +33,9 @@ variable "app_port" {
   type        = number
   default     = 3000
 }
+
+variable "vpc_id" {}
+variable "public_subnets" {
+  type = list(string)
+}
+variable "acm_certificate_arn" {}
